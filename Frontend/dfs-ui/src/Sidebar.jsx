@@ -76,13 +76,13 @@ export default function Sidebar(props) {
             <li className="sidebar-title">
                 <h3>Files</h3>
                 { addingNew ? 
-                    <button className="creation-btn med-emph" onClick={() => setAddingNew(false)}>
+                    <button className="creation-btn low-emph" onClick={() => setAddingNew(false)}>
                         <span className="material-symbols-outlined">close</span>
-                        Cancel
+                        <span className="btn-text">Cancel</span>
                     </button> : 
                     <button className="creation-btn low-emph" onClick={() => setAddingNew(true)}>
                         <span className="material-symbols-outlined">add</span>
-                        Add
+                        <span className="btn-text">Add</span>
                     </button> 
                 }
             </li>

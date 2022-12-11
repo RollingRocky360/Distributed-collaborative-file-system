@@ -16,7 +16,6 @@
     white-space: nowrap;
     word-wrap: normal;
     direction: ltr;
-    padding-right: .2rem;
     -webkit-font-smoothing: antialiased;
 }
 
@@ -108,23 +107,23 @@
     font-size: large;
 }
 
+.btn-text {
+    padding: 0 .3rem;
+}
 
 .low-emph, .med-emph, .high-emph {
     box-sizing: content-box;
     
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
 
-    padding: .2rem .8rem .2rem .6rem;
+    padding: .2rem .6rem;
     margin: 0 .4rem;
-    height: 100%;
     border-radius: 5rem;
 
     border: none;
     transition: .2s;
-
-    min-width: 4rem;
 }
 .low-emph:hover,
 .med-emph:hover,
@@ -156,7 +155,7 @@
     background-color: rgba(70, 70, 70, 0.1);
 }
 .high-emph:hover {
-    box-shadow: 0 0 9px 1px #007acc;
+    box-shadow: 0 0 13px 1px #007acc;
 }
 
 

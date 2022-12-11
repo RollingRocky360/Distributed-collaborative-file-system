@@ -8,6 +8,7 @@ import websockets
 
 ROOT = Path('D://Projects/Distributed File System/Backend/files/')
 CONNECTED = set()
+LOCKED = set()
 
 async def handler(sock):    
     CONNECTED.add(sock)
@@ -23,6 +24,8 @@ async def handler(sock):
                 filename = event['filename']
                 new_file_path = ROOT / Path(filename)
                 new_file_path.touch()
+
+                LOCKED.add(filename)
 
                 response = {
                     'type': 'create',
@@ -56,6 +59,7 @@ async def handler(sock):
             
             elif evt_type == 'close':
                 filename = event['filename']
+                LOCKED.discard(filename)
 
                 response = {
                     'type': 'unlock',
@@ -66,6 +70,7 @@ async def handler(sock):
             elif evt_type == 'delete':
                 filename = event['filename']
                 (ROOT / filename).unlink()
+                LOCKED.discard(filename)
 
                 response = {
                     'type': 'delete',
@@ -73,7 +78,9 @@ async def handler(sock):
                 }
                 websockets.broadcast(CONNECTED - {sock}, json.dumps(response))
 
-            elif evt_type == 'lock' or evt_type == 'unlock':
+            elif evt_type in ('lock', 'unlock', 'message'):
+                if evt_type == 'lock': LOCKED.add(event['filename'])
+                elif evt_type == 'unlock': LOCKED.discard(event['filename'])
                 websockets.broadcast(CONNECTED - {sock}, msg)
             
             elif evt_type == 'init':
@@ -81,7 +88,8 @@ async def handler(sock):
 
                 response = {
                     'type': 'init',
-                    'files': files
+                    'files': files,
+                    'locled': list(LOCKED),
                 }
                 await sock.send(json.dumps(response))
 
@@ -94,7 +102,6 @@ async def handler(sock):
     finally:
         CONNECTED.remove(sock)
 
-            
 
 async def main():
     async with server.serve(handler, 'localhost', 8000):

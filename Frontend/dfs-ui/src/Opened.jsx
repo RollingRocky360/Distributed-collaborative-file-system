@@ -61,20 +61,20 @@ export default function Opened(props) {
                             <span class="material-symbols-outlined">
                             lock_open
                             </span>
-                            Unlock
+                            <span className="btn-text">Unlock</span>
                         </button> :
                         <button id="edit" className="med-emph" onClick={lock}>
                             <span class="material-symbols-outlined">
                                 edit_document
                             </span>
-                            Edit
+                            <span className="btn-text">Edit</span>
                         </button> 
                     }   
                     <button id="save" className="high-emph" onClick={save}>
                         <span class="material-symbols-outlined">
                             save
                         </span>
-                        Save
+                        <span className="btn-text">Save</span>
                     </button>
                 </div>
             }

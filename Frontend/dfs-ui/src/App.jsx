@@ -4,8 +4,17 @@ import { useState, useEffect } from 'react';
 
 import Editor from './Editor';
 import Sidebar from './Sidebar';
+import Chat from './Chat';
 
 let socket;
+
+const msgCounter = (() => {
+    let count=0;
+    return () => {
+        count++;
+        return count;
+    }
+})();
 
 export default function App() {
     
@@ -13,6 +22,17 @@ export default function App() {
     let [openFiles, setOpenFiles] = useState({});
     let [lockedFiles, setLockedFiles] = useState([]);
     let [currOpen, setCurrOpen] = useState("");
+    let [msgs, setMsgs] = useState([]);
+
+    const props = {
+        socket, 
+        openFiles, setOpenFiles,
+        files, setFiles,
+        lockedFiles, setLockedFiles,
+        currOpen, setCurrOpen,
+        msgs, setMsgs,
+        msgCounter
+    }
     
     useEffect(() => {
         socket = new WebSocket('ws://localhost:8000');
@@ -102,6 +122,26 @@ export default function App() {
                     break;
                 }
 
+                case 'message': {
+                    let { author, content } = event;
+                    
+                    setMsgs(prev => {
+                        let skipauthor = ((prev.length > 0) && (prev[0].author === author));
+                        if (prev.length > 0) {
+                            console.log(prev[0].author, author, prev[0].author === author);
+                        }
+                        let newItem = {
+                            dir: "incoming",
+                            author,
+                            content,
+                            skipauthor,
+                            id: msgCounter()
+                        }
+                        return [newItem, ...prev];
+                    });
+                    break;
+                }
+
                 default: {
                     break;
                 }
@@ -115,26 +155,9 @@ export default function App() {
 
     return (
         <div className="App">
-            {files && <Sidebar 
-                socket={socket}
-                openFiles={openFiles} 
-                setOpenFiles={setOpenFiles} 
-                files={files}
-                setFiles={setFiles}
-                lockedFiles={lockedFiles}
-                setLockedFiles={setLockedFiles} 
-                setCurrOpen={setCurrOpen} />}
-
-            <Editor 
-                socket={socket}
-                openFiles={openFiles}
-                setOpenFiles={setOpenFiles}
-                files={files}
-                setFiles={setFiles}
-                lockedFiles={lockedFiles}
-                setLockedFiles={setLockedFiles}
-                currOpen={currOpen}
-                setCurrOpen={setCurrOpen} />
+            {files && <Sidebar {...props} />}
+            <Editor {...props}/>
+            <Chat {...props} />
         </div>
     );
 }

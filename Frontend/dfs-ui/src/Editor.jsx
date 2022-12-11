@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Opened from "./Opened";
 
 export default function Editor(props) {
-    const { socket, openFiles, setOpenFiles, currOpen, setCurrOpen, lockedFiles } = props
+    const { socket, openFiles, setOpenFiles, currOpen } = props
     const textbox = useRef(null);
 
     function save() {
@@ -31,14 +31,7 @@ export default function Editor(props) {
 
     return (
         <div className="editor">
-            <Opened 
-                openFiles={openFiles} 
-                currOpen={currOpen} 
-                setCurrOpen={setCurrOpen} 
-                socket={socket}
-                setOpenFiles={setOpenFiles} 
-                lockedFiles={lockedFiles}
-                save={save} />
+            <Opened {...props} save={save} />
             <div 
                 ref={textbox}
                 name="textarea" 
