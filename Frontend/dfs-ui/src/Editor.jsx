@@ -32,7 +32,7 @@ export default function Editor(props) {
     return (
         <div className="editor">
             <Opened {...props} save={save} />
-            <div 
+            <pre 
                 ref={textbox}
                 name="textarea" 
                 id="textarea" 
@@ -42,7 +42,7 @@ export default function Editor(props) {
                 }                
                 onKeyDown={handleKeyPress} >
                 {openFiles[currOpen] && openFiles[currOpen].data}
-            </div>
+            </pre>
         </div>
     )
 }

@@ -81,7 +81,7 @@ export default function Sidebar(props) {
                         <span className="btn-text">Cancel</span>
                     </button> : 
                     <button className="creation-btn low-emph" onClick={() => setAddingNew(true)}>
-                        <span className="material-symbols-outlined">add</span>
+                        <span className="material-symbols-outlined">note_add</span>
                         <span className="btn-text">Add</span>
                     </button> 
                 }
@@ -102,12 +102,14 @@ export default function Sidebar(props) {
                 </li>
             )) }
 
-            { !addingNew ? null : <li className="input-item">
-                <span className="material-symbols-outlined">
-                    description
-                </span>
-                <input type="text" name="newfile" id="newfilename" onKeyUp={handleKeyPress} autoComplete="off" />.txt
-            </li> }
+            { !addingNew ? 
+                null : 
+                <li className="input-item">
+                    <span className="material-symbols-outlined">
+                        description
+                    </span>
+                    <input type="text" name="newfile" id="newfilename" onKeyUp={handleKeyPress} autoComplete="off" />.txt
+                </li> }
         </ul>
     )
 }
