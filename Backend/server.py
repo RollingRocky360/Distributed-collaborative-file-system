@@ -1,9 +1,11 @@
 import os
 from bson.objectid import ObjectId
 from pathlib import Path
+import json
 
 from flask import Flask, request
 from flask_cors import CORS
+from flask_sock import Sock, ConnectionClosed
 from pymongo.mongo_client import MongoClient
 
 from argon2 import PasswordHasher
@@ -13,7 +15,7 @@ import jwt
 load_dotenv('.env')
 
 
-SECRET = os.getenv('SECRET')
+SECRET = os.environ('SECRET')
 
 db_uri = f"mongodb+srv://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}@cluster0.w3vpkf7.mongodb.net/?retryWrites=true&w=majority"
 db_uri = "mongodb://localhost:27017"
@@ -30,6 +32,13 @@ ph = PasswordHasher()
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000', 'https://rollingrocky360.github.io'], supports_credentials=True)
+
+
+CONNECTED = set()
+LOCKED = set()
+
+websock = Sock(app)
+
 
 @app.get('/ping')
 def ping():
@@ -81,3 +90,111 @@ def workspace_post():
     Workspaces.update_one({ 'user_id': user_id['_id'] }, { '$push': { 'workspaces': workspace_name}})
     (workspace_dir / workspace_name).mkdir()
     return Workspaces.find_one({'user_id': user_id['_id']})['workspaces']
+
+
+@websock.route('/')
+def websocket_handler(sock):
+    CONNECTED.add(sock)
+    print("connected")
+
+    try:
+        while True:
+            msg = sock.receive()
+            print(msg)
+            event = json.loads(msg)
+            evt_type = event['type']
+
+            if evt_type == 'create':
+                filename = event['filename']
+                new_file_path = workspace_dir / Path(filename)
+                new_file_path.touch()
+
+                LOCKED.add(filename)
+
+                response = {
+                    'type': 'create',
+                    'filename': filename
+                }
+                wsresp = json.dumps(response)
+                for outbound_sock in CONNECTED - {sock}:
+                    outbound_sock.send(wsresp)
+
+            elif evt_type == 'read':
+                filename = Path(event['filename'])
+                with (workspace_dir / filename).open() as file:
+                    response = {
+                        'type': 'read',
+                        'filename': filename.name,
+                        'payload': file.read()
+                    }
+                    sock.send(json.dumps(response))
+
+            elif evt_type == 'write':
+                filename = Path(event['filename'])
+                data = event['data']
+
+                with (workspace_dir / filename).open('w') as file:
+                    file.write(data)
+
+                response = {
+                    'type': 'update',
+                    'filename': filename.name,
+                    'payload': data,
+                }
+                wsresp = json.dumps(response)
+                for outbound_sock in CONNECTED - {sock}:
+                    outbound_sock.send(wsresp)
+
+            elif evt_type == 'close':
+                filename = Path(event['filename'])
+                LOCKED.discard(filename.name)
+
+                response = {
+                    'type': 'unlock',
+                    'filename': filename.name,
+                }
+                wsresp = json.dumps(response)
+                for outbound_sock in CONNECTED - {sock}:
+                    outbound_sock.send(wsresp)
+
+            elif evt_type == 'delete':
+                filename = Path(event['filename'])
+                (workspace_dir / filename).unlink()
+                LOCKED.discard(filename.name)
+
+                response = {
+                    'type': 'delete',
+                    'filename': filename.name,
+                }
+                wsresp = json.dumps(response)
+                for outbound_sock in CONNECTED - {sock}:
+                    outbound_sock.send(wsresp)
+
+            elif evt_type in ('lock', 'unlock', 'message'):
+                if evt_type == 'lock':
+                    LOCKED.add(event['filename'])
+                elif evt_type == 'unlock':
+                    LOCKED.discard(event['filename'])
+                for outbound_sock in CONNECTED - {sock}:
+                    outbound_sock.send(msg)
+
+            elif evt_type == 'init':
+                workspace_path = workspace_dir / Path(event['workspace'])
+                files = sorted(
+                    [file.name for file in workspace_path.iterdir()])
+
+                response = {
+                    'type': 'init',
+                    'files': files,
+                    'locked': list(LOCKED),
+                }
+                sock.send(json.dumps(response))
+
+            elif evt_type == 'ping':
+                sock.send('pong')
+
+    except ConnectionClosed:
+        print("Disconnected abruptly.")
+
+    finally:
+        CONNECTED.remove(sock)
