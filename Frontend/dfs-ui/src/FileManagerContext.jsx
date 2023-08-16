@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { WebSocketContext } from "./WebSocketContext";
 
 export const FileManagerContext = createContext({});
 

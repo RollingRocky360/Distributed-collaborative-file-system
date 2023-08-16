@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import './Dashboard.css'
 
+import { useEffect, useState } from 'react';
 
 import { WebSocketContextProvider } from './WebSocketContext'
 import { FileManagerContextProvider } from './FileManagerContext'
@@ -9,6 +9,8 @@ import Editor from './Editor';
 import Sidebar from './Sidebar';
 import Chat from './Chat';
 
+const BASE_URL = 'https://colabo-api.onrender.com';
+
 export default function Dashboard() {
     const [workspaces, setWorkspaces] = useState([]);
     const [openedWorkspace, setOpenedWorkspace] = useState(null);
@@ -16,7 +18,7 @@ export default function Dashboard() {
     const [creatingWorkspace, setCreatingWorkspace] = useState(undefined);
 
     useEffect(() => {
-        fetch('http://localhost:8000/workspace', {
+        fetch(BASE_URL + '/workspace', {
             headers: {
                 'Authorization': 'BEARER ' + localStorage.getItem('token')
             }
@@ -28,7 +30,7 @@ export default function Dashboard() {
     async function handleKeypress(e) {
         if (e.key !== 'Enter' || e.target.value.length <= 2) return;
 
-        const workspaceCreateResp = await fetch('http://localhost:8000/workspace', {
+        const workspaceCreateResp = await fetch(BASE_URL + '/workspace', {
             method: 'POST',
             headers: {
                 'Content-type': 'application/json',

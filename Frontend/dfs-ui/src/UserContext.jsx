@@ -1,5 +1,7 @@
 import { createContext, useState } from "react";
 
+const BASE_URL = 'https://colabo-api.onrender.com'
+
 export const UserContext = createContext(undefined);
 
 export function UserContextProvider({ children }) {
@@ -12,7 +14,7 @@ export function UserContextProvider({ children }) {
             return;
         }
 
-        const fetchUserResp = await fetch('http://localhost:8000/auth', {
+        const fetchUserResp = await fetch(BASE_URL + '/auth', {
             headers: {
                 'Authorization': 'BEARER ' + token
             }
@@ -22,7 +24,7 @@ export function UserContextProvider({ children }) {
     }
 
     async function login(email, password) {
-        const loginResp = await fetch('http://localhost:8000/user', {
+        const loginResp = await fetch(BASE_URL + '/user', {
             headers: {
                 'Authorization': 'BASIC ' + `${email}:${password}`
             }
@@ -33,7 +35,7 @@ export function UserContextProvider({ children }) {
     }
 
     async function register(email, username, password) {
-        const registerResp = await fetch('http://localhost:8000/user', {
+        const registerResp = await fetch(BASE_URL + '/user', {
             method: 'POST',
             headers: {
                 'Content-type': 'Application/json'

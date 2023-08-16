@@ -3,7 +3,7 @@ from bson.objectid import ObjectId
 from pathlib import Path
 
 from flask import Flask, request
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from pymongo.mongo_client import MongoClient
 
 from argon2 import PasswordHasher
@@ -81,6 +81,3 @@ def workspace_post():
     Workspaces.update_one({ 'user_id': user_id['_id'] }, { '$push': { 'workspaces': workspace_name}})
     (workspace_dir / workspace_name).mkdir()
     return Workspaces.find_one({'user_id': user_id['_id']})['workspaces']
-
-if __name__ == '__main__':
-    app.run(debug=True, port=8000)

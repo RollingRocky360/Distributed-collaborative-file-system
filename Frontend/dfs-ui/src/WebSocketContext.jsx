@@ -9,7 +9,7 @@ export function WebSocketContextProvider({ workspace, children }) {
     const fm = useContext(FileManagerContext);
     
     useEffect(() => {
-        socket = new WebSocket('ws://localhost:8001');
+        socket = new WebSocket('wss://colabo-api.onrender.com');
 
         socket.onopen = () => {
             socket.send(JSON.stringify({
