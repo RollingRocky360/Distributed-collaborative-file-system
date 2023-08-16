@@ -93,6 +93,9 @@ async def handler(sock):
                     'locked': list(LOCKED),
                 }
                 await sock.send(json.dumps(response))
+            
+            elif evt_type == 'ping':
+                await sock.send('pong')
 
     except ConnectionClosedError:
         print("Disconnected abruptly.")
@@ -105,7 +108,7 @@ async def handler(sock):
 
 
 async def run_socketserver():
-    async with server.serve(handler, 'localhost', port=8001):
+    async with server.serve(handler):
         await asyncio.Future()
 
 if __name__ == '__main__':
