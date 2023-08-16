@@ -15,7 +15,7 @@ import jwt
 load_dotenv('.env')
 
 
-SECRET = os.environ('SECRET')
+SECRET = os.environ['SECRET']
 
 db_uri = f"mongodb+srv://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}@cluster0.w3vpkf7.mongodb.net/?retryWrites=true&w=majority"
 db_uri = "mongodb://localhost:27017"
