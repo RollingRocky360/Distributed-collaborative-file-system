@@ -108,7 +108,7 @@ async def handler(sock):
 
 
 async def run_socketserver():
-    async with server.serve(handler):
+    async with server.serve(handler, host="", port=8000):
         await asyncio.Future()
 
 if __name__ == '__main__':
