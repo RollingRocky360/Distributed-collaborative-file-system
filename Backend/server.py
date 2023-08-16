@@ -92,7 +92,7 @@ def workspace_post():
     return Workspaces.find_one({'user_id': user_id['_id']})['workspaces']
 
 
-@websock.route('/')
+@websock.route('/ws')
 def websocket_handler(sock):
     CONNECTED.add(sock)
     print("connected")
