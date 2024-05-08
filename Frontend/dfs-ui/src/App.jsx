@@ -1,10 +1,9 @@
-
 import './App.css';
 
-import Auth from './Auth';
+import Auth from './components/Auth';
 import { useContext, useEffect } from 'react';
-import { UserContext } from './UserContext';
-import Dashboard from './Dashboard';
+import { UserContext } from './contexts/UserContext';
+import Dashboard from './components/Dashboard';
 
 export default function App() {
     const { user, fetchUser } = useContext(UserContext);

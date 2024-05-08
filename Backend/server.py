@@ -8,7 +8,7 @@ from flask_cors import CORS
 from flask_sock import Sock, ConnectionClosed
 from pymongo.mongo_client import MongoClient
 
-from argon2 import PasswordHasher
+import bcrypt
 from dotenv import load_dotenv
 import jwt
 
@@ -18,7 +18,7 @@ load_dotenv('.env')
 SECRET = os.environ['SECRET']
 
 db_uri = f"mongodb+srv://{os.environ['DB_USER']}:{os.environ['DB_PASSWORD']}@cluster0.w3vpkf7.mongodb.net/?retryWrites=true&w=majority"
-db_uri = "mongodb://localhost:27017"
+# db_uri = "mongodb://localhost:27017"
           
 client = MongoClient(db_uri)
 db = client.test
@@ -26,9 +26,6 @@ Users = db.user
 Workspaces = db.workspace
 
 workspace_dir = Path('./workspaces')
-
-ph = PasswordHasher()
-
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3000', 'https://rollingrocky360.github.io'], supports_credentials=True)
@@ -59,7 +56,7 @@ def user_get():
     user = Users.find_one({ 'email': email })
     user['_id'] = str(user['_id'])
     user['token'] = jwt.encode({'_id': user['_id']}, SECRET)
-    if ph.verify(user['password'], password):
+    if bcrypt.checkpw(password.encode('utf-8'), user['password'].encode('utf-8')):
         return user
     return { 'error': 'Invalid credentials' }
 
@@ -70,10 +67,12 @@ def user_post():
     if Users.find_one({ 'email': creds['email'] }):
         return { 'error': 'User Already Exists' }
     
-    creds['password'] = ph.hash(creds['password'])
+    salt = bcrypt.gensalt()
+    creds['password'] = str(bcrypt.hashpw(creds['password'].encode('utf-8'), salt))
     id = str(Users.insert_one(creds).inserted_id)
     creds['_id'] = id
     creds['token'] = jwt.encode({'_id': id}, SECRET)
+    print(creds['token'])
     Workspaces.insert_one({ 'user_id': id, 'workspaces': [] })
     return creds
 
@@ -198,3 +197,6 @@ def websocket_handler(sock):
 
     finally:
         CONNECTED.remove(sock)
+
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -1,7 +1,7 @@
-import './Auth.css'
+import '../css/Auth.css'
 
 import { useContext, useState } from "react"
-import { UserContext } from "./UserContext";
+import { UserContext } from "../contexts/UserContext";
 
 export default function Auth() {
 

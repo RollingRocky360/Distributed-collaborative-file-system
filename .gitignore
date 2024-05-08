@@ -1,3 +1,5 @@
 Backend/db
 Backend/workspaces
+Backend/venv
+Backend/.env
 Frontend/dfs-ui/node_modules

@@ -1,9 +1,8 @@
-
 import { useContext, useRef } from "react";
 
 import Opened from "./Opened";
-import { FileManagerContext } from "./FileManagerContext";
-import { WebSocketContext } from "./WebSocketContext";
+import { FileManagerContext } from "../contexts/FileManagerContext";
+import { WebSocketContext } from "../contexts/WebSocketContext";
 
 export default function Editor() {
     const fm = useContext(FileManagerContext);

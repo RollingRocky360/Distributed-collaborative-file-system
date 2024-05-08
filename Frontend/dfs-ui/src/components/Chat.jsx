@@ -1,9 +1,9 @@
-import './Chat.css'
+import '../css/Chat.css'
 
 import { useContext, useState } from "react"
 import { useRef } from 'react';
-import { WebSocketContext } from './WebSocketContext';
-import { UserContext } from './UserContext';
+import { WebSocketContext } from '../contexts/WebSocketContext';
+import { UserContext } from '../contexts/UserContext';
 
 
 const msgCounter = (() => {

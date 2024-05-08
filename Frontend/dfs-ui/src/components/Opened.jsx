@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { WebSocketContext } from "./WebSocketContext";
-import { FileManagerContext } from "./FileManagerContext";
+import { WebSocketContext } from "../contexts/WebSocketContext";
+import { FileManagerContext } from "../contexts/FileManagerContext";
 
 export default function Opened({ save }) {
     const socket = useContext(WebSocketContext);
