@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
 
-const BASE_URL = 'http://localhost:5000'
+const BASE_URL = 'https://colabo-api.onrender.com'
 
 export const UserContext = createContext(undefined);
 

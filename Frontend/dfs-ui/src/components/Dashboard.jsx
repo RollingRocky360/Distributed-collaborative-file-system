@@ -9,7 +9,7 @@ import Editor from './Editor';
 import Sidebar from './Sidebar';
 import Chat from './Chat';
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'https://colabo-api.onrender.com';
 
 export default function Dashboard() {
     const [workspaces, setWorkspaces] = useState([]);
